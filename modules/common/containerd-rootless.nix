@@ -196,7 +196,7 @@ let
         Type = "simple";
         Restart = "always";
         RestartSec = "2";
-        ExecStart = "${nsenter} -- ${pkgs.buildkit}/bin/buildkit --oci-worker=false --containerd-worker=true --containerd-worker-rootless=true --containerd-worker-snapshotter=nix --addr=unix://${XDG_RUNTIME_DIR}/buildkit-default/buildkitd.sock --root=${XDG_DATA_HOME}/buildkit-default --containerd-worker-namespace=default";
+        ExecStart = "${nsenter} -- ${pkgs.buildkit}/bin/buildkit --oci-worker=false --containerd-worker=true --containerd-worker-rootless=true --containerd-worker-snapshotter=nix --addr=unix:///run/user/1000/buildkit-default/buildkitd.sock --root=~/.local/share/buildkit-default --containerd-worker-namespace=default";
         ExecReload = "${pkgs.procps}/bin/kill -s HUP $MAINPID";
 
         # StateDirectory = "containerd";
