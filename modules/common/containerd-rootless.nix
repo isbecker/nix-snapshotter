@@ -177,7 +177,7 @@ let
 
   mkRootlessBuildkitService = cfg:
     let
-      buildKitArgs = 
+      # buildKitArgs = 
     in {
       Unit = {
         Description = "BuildKit (Rootless)";
