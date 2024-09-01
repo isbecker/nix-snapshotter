@@ -25,5 +25,6 @@ in {
     '');
 
     systemd.user.services.containerd = cfg.lib.mkRootlessContainerdService cfg;
+    systemd.user.services.buildkitd = cfg.lib.mkRootlessBuildkitService cfg;
   };
 }
