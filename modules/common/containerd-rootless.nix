@@ -177,7 +177,7 @@ let
 
   mkRootlessBuildkitService = cfg:
     let
-      # buildKitArgs = 
+      buildKitArgs = 
     in {
       Unit = {
         Description = "BuildKit (Rootless)";
@@ -196,7 +196,7 @@ let
         Type = "simple";
         Restart = "always";
         RestartSec = "2";
-        ExecStart = "${nsenter}/bin/containerd-nsenter ${pkgs.buildkit}/bin/buildkitd --oci-worker=false --containerd-worker=true --containerd-worker-rootless=true --containerd-worker-snapshotter=nix --addr=unix://run/user/1000/buildkit-default/buildkitd.sock --root=${config.xdg.dataHome}/buildkit-default --containerd-worker-namespace=default";
+        ExecStart = "${nsenter}/bin/containerd-nsenter ${pkgs.buildkit}/bin/buildkitd --oci-worker=false --containerd-worker=true --containerd-worker-rootless=true --containerd-worker-snapshotter=${cfg.setSnapshotter} --addr=unix://run/user/1000/buildkit-${cfg.setNamespace}/buildkitd.sock --root=${config.xdg.dataHome}/buildkit-${cfg.setNamespace} --containerd-worker-namespace=${cfg.setNamespace}";
         ExecReload = "${pkgs.procps}/bin/kill -s HUP $MAINPID";
 
         # StateDirectory = "containerd";
