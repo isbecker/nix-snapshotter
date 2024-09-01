@@ -175,6 +175,55 @@ let
       };
     };
 
+      mkRootlessBuildkitService = cfg:
+    let
+      # buildKitArgs = 
+    in {
+      Unit = {
+        Description = "BuildKit (Rootless)";
+        PartOf = "containerd.service";
+        # containerd-rootless doesn't support running as root.
+        # ConditionUser = "!root";
+        # StartLimitBurst = "16";
+        # StartLimitInterval = "120s";
+      };
+
+      Install = {
+        WantedBy = [ "default.target" ];
+      };
+
+      Service = {
+        Type = "simple";
+        Restart = "always";
+        RestartSec = "2";
+        ExecStart = "${nsenter} -- ${pkgs.buildkit}/bin/buildkit --oci-worker=false --containerd-worker=true --containerd-worker-rootless=true --containerd-worker-snapshotter=nix --addr=unix://${XDG_RUNTIME_DIR}/buildkit-default/buildkitd.sock --root=${XDG_DATA_HOME}/buildkit-default --containerd-worker-namespace=default";
+        ExecReload = "${pkgs.procps}/bin/kill -s HUP $MAINPID";
+
+        # StateDirectory = "containerd";
+        # RuntimeDirectory = "containerd";
+        # RuntimeDirectoryPreserve = "yes";
+
+        # Don't kill child processes like containerd-shim.
+        KillMode = "mixed"; 
+
+        # Allow process in pid namespace to notify systemd.
+        NotifyAccess = "all";
+
+        # Having non-zero Limit*s causes performance problems due to accounting
+        # overhead in the kernel. We recommend using cgroups to do
+        # container-local accounting.
+        #
+        # Limits adopted from upstream.
+        # See: https://github.com/containerd/containerd/blob/c3f3cad287fb53793c83b8d83397ef1187ad27a1/containerd.service
+        # LimitNOFILE = "infinity";
+        # LimitNPROC = "infinity";
+        # LimitCORE = "infinity";
+        # TasksMax = "infinity";
+        # OOMScoreAdjust="-999";
+      };
+    };
+
+
 in {
   imports = [
     ./containerd.nix
@@ -246,6 +295,7 @@ in {
       default = {
         inherit
           mkRootlessContainerdService
+          mkRootlessBuildkitService
         ;
       };
       internal = true;
